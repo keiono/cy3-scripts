@@ -1,11 +1,16 @@
-// Creates a complete graph with 10 nodes.
+// Creates a complete graph with 20 nodes.
 ( function() {
         importPackage(Packages.org.cytoscape.app.CyAppAdapter);
         importPackage(Packages.org.cytoscape.model.CyNetwork);
+        importPackage(java.util);
         
-        var numberOfNodes = 10;
-        createCompleteGraph(numberOfNodes);
+        var numberOfNodes = 20;
+        var view = createView(createCompleteGraph(numberOfNodes));
+        cyAppAdapter.getCyNetworkViewManager().addNetworkView(view);
         
+
+
+
         function createCompleteGraph(networkSize) {
             var newNetwork = cyAppAdapter.getCyNetworkFactory().createNetwork();
             newNetwork.getRow(newNetwork).set("name", "Complete Graph with " + numberOfNodes + " Nodes");
@@ -33,6 +38,25 @@
                     }
                 }
             }
+            
+            return newNetwork;
+        }
+        
+        // Create view and apply current style and layout.
+        function createView(network) {
+        		var networkView = cyAppAdapter.getCyNetworkViewFactory().createNetworkView(network);
+        		var tf = cyAppAdapter.get_ApplyPreferredLayoutTaskFactory();
+        		var tm = cyAppAdapter.getTaskManager();
+        		var vmm = cyAppAdapter.getVisualMappingManager();
+        		var visualStyle = vmm.getCurrentVisualStyle();
+        		vmm.setVisualStyle(visualStyle, networkView);
+        		visualStyle.apply(networkView);
+        		
+        		var networkViewSet = new HashSet();
+        		networkViewSet.add(networkView);
+        		tm.execute(tf.createTaskIterator(networkViewSet));
+            
+            return networkView;
         }
 
     }());
